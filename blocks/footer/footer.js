@@ -1,17 +1,21 @@
-import { getMetadata } from '../../scripts/aem.js';
 import { loadFragment } from '../fragment/fragment.js';
+import { getChromeFragmentUrl } from '../../scripts/chrome.js';
 
 /**
  * loads and decorates the footer
  * @param {Element} block The footer block element
  */
 export default async function decorate(block) {
-  // load footer as fragment
-  const footerMeta = getMetadata('footer');
-  const footerPath = footerMeta ? new URL(footerMeta, window.location).pathname : '/footer';
-  const fragment = await loadFragment(footerPath);
+  const chromeUrl = getChromeFragmentUrl('footer');
+  block.dataset.chromeSource = chromeUrl;
 
-  // decorate footer DOM
+  const fragment = await loadFragment(chromeUrl);
+  if (!fragment?.firstElementChild) {
+    block.dataset.chromeStatus = 'missing';
+    return;
+  }
+  block.dataset.chromeStatus = 'loaded';
+
   block.textContent = '';
   const footer = document.createElement('div');
   while (fragment.firstElementChild) footer.append(fragment.firstElementChild);

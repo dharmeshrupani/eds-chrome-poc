@@ -1,5 +1,5 @@
-import { getMetadata } from '../../scripts/aem.js';
 import { loadFragment } from '../fragment/fragment.js';
+import { getChromeFragmentUrl } from '../../scripts/chrome.js';
 
 // media query match that indicates mobile/tablet width
 const isDesktop = window.matchMedia('(min-width: 900px)');
@@ -91,10 +91,15 @@ function toggleMenu(nav, navSections, forceExpanded = null) {
  * @param {Element} block The header block element
  */
 export default async function decorate(block) {
-  // load nav as fragment
-  const navMeta = getMetadata('nav');
-  const navPath = navMeta ? new URL(navMeta, window.location).pathname : '/nav';
-  const fragment = await loadFragment(navPath);
+  const chromeUrl = getChromeFragmentUrl('header');
+  block.dataset.chromeSource = chromeUrl;
+
+  const fragment = await loadFragment(chromeUrl);
+  if (!fragment?.firstElementChild) {
+    block.dataset.chromeStatus = 'missing';
+    return;
+  }
+  block.dataset.chromeStatus = 'loaded';
 
   // decorate nav DOM
   block.textContent = '';
@@ -109,10 +114,11 @@ export default async function decorate(block) {
   });
 
   const navBrand = nav.querySelector('.nav-brand');
-  const brandLink = navBrand.querySelector('.button');
+  const brandLink = navBrand?.querySelector('.button');
   if (brandLink) {
     brandLink.className = '';
-    brandLink.closest('.button-container').className = '';
+    const container = brandLink.closest('.button-container');
+    if (container) container.className = '';
   }
 
   const navSections = nav.querySelector('.nav-sections');
@@ -124,7 +130,7 @@ export default async function decorate(block) {
       // wrap the dropdown label in a button so it is announced as expandable
       const button = document.createElement('button');
       button.type = 'button';
-      button.setAttribute('aria-expanded', false);
+      button.setAttribute('aria-expanded', 'false');
       [...navSection.childNodes].forEach((node) => {
         if (node !== subList) button.append(node);
       });
