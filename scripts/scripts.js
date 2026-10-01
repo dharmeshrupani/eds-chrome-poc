@@ -12,6 +12,38 @@ import {
   buildBlock,
 } from './aem.js';
 
+/**
+ * Moves attributes from one element to another.
+ * @param {Element} from the element to copy attributes from
+ * @param {Element} to the element to copy attributes to
+ * @param {string[]} [attributes] attribute names to move; defaults to all
+ */
+export function moveAttributes(from, to, attributes) {
+  if (!from || !to) return;
+  const names = attributes || [...from.attributes].map(({ nodeName }) => nodeName);
+  names.forEach((attr) => {
+    const value = from.getAttribute(attr);
+    if (value) {
+      to.setAttribute(attr, value);
+      from.removeAttribute(attr);
+    }
+  });
+}
+
+/**
+ * Moves Universal Editor instrumentation onto the element that replaces `from`.
+ * Keeps `data-aue-*` and `data-richtext-*` when decoration rebuilds the DOM.
+ * @param {Element} from the element to copy attributes from
+ * @param {Element} to the element to copy attributes to
+ */
+export function moveInstrumentation(from, to) {
+  if (!from) return;
+  const names = [...from.attributes]
+    .map(({ nodeName }) => nodeName)
+    .filter((attr) => attr.startsWith('data-aue-') || attr.startsWith('data-richtext-'));
+  moveAttributes(from, to, names);
+}
+
 if (window.trustedTypes && window.trustedTypes.createPolicy) {
   const innerTT = window.trustedTypes.createPolicy('tt-inner', {
     createHTML: (s) => s, // avoid stack overflow

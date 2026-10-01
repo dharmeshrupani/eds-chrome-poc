@@ -5,6 +5,10 @@ Your project's description...
 - Preview: https://main--eds-chrome-poc--dharmeshrupani.aem.page/
 - Live: https://main--eds-chrome-poc--dharmeshrupani.aem.live/
 
+## Shared chrome
+
+Header and footer can be authored once on a Universal Editor site and rendered on Document Authoring pages. Paths, configuration, and the two-site check are in [docs/SHARED-CHROME-POC.md](docs/SHARED-CHROME-POC.md).
+
 ## Documentation
 
 Before using the aem-boilerplate, we recommand you to go through the documentation on https://www.aem.live/docs/ and more specifically:
